@@ -72,6 +72,24 @@ export interface ApiResponse<T> {
   error?: ApiErrorResponse;
 }
 
+export function successResponse<T>(data: T): ApiResponse<T> {
+  return {
+    success: true,
+    data: data
+  }
+}
+
+export function errorResponse(apiError: ApiError): ApiResponse<never> {
+  return {
+    success: false,
+    error: {
+      error: apiError.message,
+      code: apiError.getStatus(),
+      details: apiError.details
+    }
+  }
+}
+
 export const createErrorResponses = {
   conflict: (message: string): ApiError => new ApiError(message, 409),
   badRequest: (message: string): ApiError => new ApiError(message, 400),
