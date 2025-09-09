@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "PapuDrive Super-MVP REST",
+    "description": "Colección completa para testing del Super-MVP REST Files\n\nConfigurar variable: {{baseUrl}} = http://localhost:3000\n\nTodos los endpoints están listos para usar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 0,
+      "minor": 1,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "1. Upload File",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": [],
+              "description": "Selecciona un archivo PNG, JPG o PDF (max 25MB)"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/files",
+          "host": ["{{baseUrl}}"],
+          "path": ["files"]
+        },
+        "description": "Sube un archivo con validaciones:\n- MIME types: image/png, image/jpeg, application/pdf\n- Tamaño máximo: 25MB\n- Sanitización automática del filename\n\nRespuesta incluye: id, filename, sizeBytes, mimeType, createdAt"
+      },
+      "response": []
+    },
+    {
+      "name": "2. List Files",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/files",
+          "host": ["{{baseUrl}}"],
+          "path": ["files"]
+        },
+        "description": "Lista todos los archivos del usuario demo-user.\n\nRespuesta incluye metadatos completos: id, ownerId, filename, sizeBytes, mimeType, path, createdAt"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Download File",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/files/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["files", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "",
+              "description": "ID del archivo obtenido del upload o listado"
+            }
+          ]
+        },
+        "description": "Descarga el archivo binario por ID.\n\nHeaders de respuesta:\n- Content-Type: MIME type original\n- Content-Disposition: attachment con filename\n- Content-Length: tamaño del archivo\n\nReemplaza :id con el UUID del archivo."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Delete File",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/files/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["files", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "",
+              "description": "ID del archivo a eliminar"
+            }
+          ]
+        },
+        "description": "Elimina un archivo por ID.\n\nCleanup completo:\n- Remueve archivo del disco\n- Elimina metadatos del JSON\n\nRespuesta: mensaje de confirmación"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "URL base del servidor NestJS"
+    }
+  ]
+}
