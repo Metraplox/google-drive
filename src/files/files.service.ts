@@ -18,7 +18,9 @@ export class FilesService {
     private readonly filesRepository: FilesRepository,
     private readonly configService: ConfigService,
   ) {
-    this.maxUploadMB = parseInt(this.configService.get<string>('MAX_UPLOAD_MB', '25'));
+    const rawMaxUpload = this.configService.get<string>('MAX_UPLOAD_MB', '25');
+    const parsedMaxUpload = Number(rawMaxUpload);
+    this.maxUploadMB = Number.isFinite(parsedMaxUpload) && parsedMaxUpload > 0 ? parsedMaxUpload : 25;
     this.allowedMimeTypes = this.configService
       .get<string>('ALLOWED_MIME_LIST', 'image/png,image/jpeg,application/pdf')
       .split(',')

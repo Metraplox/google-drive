@@ -120,6 +120,33 @@ describe('FilesService', () => {
       );
     });
 
+    it('should fall back to default limit when MAX_UPLOAD_MB is invalid', async () => {
+      const invalidConfigService = {
+        get: jest.fn((key: string, defaultValue?: string) => {
+          if (key === 'MAX_UPLOAD_MB') {
+            return 'not-a-number';
+          }
+          if (key === 'ALLOWED_MIME_LIST') {
+            return 'image/png,image/jpeg,application/pdf';
+          }
+          if (key === 'UPLOADS_DIR') {
+            return './uploads';
+          }
+          return defaultValue as string;
+        }),
+      } as unknown as ConfigService;
+
+      const serviceWithInvalidConfig = new FilesService(repository, invalidConfigService);
+      const largeFile = { ...mockFile, size: 26 * 1024 * 1024 }; // 26MB
+
+      await expect(serviceWithInvalidConfig.uploadFile(largeFile)).rejects.toThrow(
+        BadRequestException
+      );
+      await expect(serviceWithInvalidConfig.uploadFile(largeFile)).rejects.toThrow(
+        'File size exceeds limit of 25MB'
+      );
+    });
+
     it('should handle MIME types case-insensitively', async () => {
       const mockAdd = jest.spyOn(repository, 'add').mockResolvedValue();
       jest.spyOn(fs, 'mkdir').mockResolvedValue(undefined);
