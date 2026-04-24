@@ -3,7 +3,7 @@
  * Follows PM requirements: anti-path-traversal, Unicode normalization, length limits
  */
 
-export function sanitizeFilename(filename: string): string {
+export function sanitizeFilename(filename: string, maxLength = 120): string {
   if (!filename || typeof filename !== 'string') {
     throw new Error('Filename must be a non-empty string');
   }
@@ -26,13 +26,18 @@ export function sanitizeFilename(filename: string): string {
   // 4. Replace spaces with underscores for URL safety
   sanitized = sanitized.replace(/\s/g, '_');
 
-  // 5. Limit length (120 chars max as per PM spec)
-  if (sanitized.length > 120) {
-    const extension = sanitized.includes('.') 
-      ? '.' + sanitized.split('.').pop() 
+  // 5. Limit length (maxLength chars max as per PM spec)
+  if (sanitized.length > maxLength) {
+    const extension = sanitized.includes('.')
+      ? '.' + sanitized.split('.').pop()
       : '';
-    const nameOnly = sanitized.substring(0, 120 - extension.length);
-    sanitized = nameOnly + extension;
+
+    if (extension.length > maxLength) {
+      sanitized = sanitized.substring(0, maxLength);
+    } else {
+      const nameOnly = sanitized.substring(0, maxLength - extension.length);
+      sanitized = nameOnly + extension;
+    }
   }
 
   // 6. Ensure we still have a valid filename
